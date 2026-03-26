@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<body>
+<style>
+  #ui-jelly {
+    /* 浅色模式 - 多彩果冻渐变 */
+    --bg-base: linear-gradient(135deg, #fdfbfb 0%, #f4ebfa 100%);
+    --ui-bd: rgba(216, 180, 254, 0.4);
+    --txt-m: #4c1d95; --txt-h: #7e22ce;
+    
+    /* 1级果冻按钮 (3D立体) */
+    --j-bg1: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(243,232,255,0.7));
+    --j-sh1: 0 4px 10px rgba(126, 34, 206, 0.1), inset 0 2px 0 #fff, inset 0 -4px 6px rgba(216, 180, 254, 0.4);
+    --j-hv1: linear-gradient(145deg, #fff, rgba(233,213,255,0.8));
+    
+    /* 2级果冻按钮 (微凹陷立体) */
+    --j-bg2: rgba(255, 255, 255, 0.6);
+    --j-sh2: 0 2px 5px rgba(0,0,0,0.05), inset 0 1px 0 #fff, inset 0 -2px 4px rgba(216, 180, 254, 0.3);
+    
+    /* 选项气泡 */
+    --opt-bg: rgba(255,255,255,0.8);
+    --opt-sh: 0 2px 4px rgba(126, 34, 206, 0.08), inset 0 1px 0 #fff;
+    --opt-ok: linear-gradient(145deg, #a855f7, #7e22ce);
+    --opt-ok-sh: 0 4px 10px rgba(147, 51, 234, 0.3), inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -3px 5px rgba(0,0,0,0.2);
+    
+    /* 日月切换方块 (反差色，无黄) */
+    --tm-bg: #130a1c; --tm-tx: #f8fafc; --tm-bd: #4c1d95;
+    
+    background: var(--bg-base); border: 1px solid var(--ui-bd); border-radius: 20px;
+    padding: 20px; color: var(--txt-m); font-family: sans-serif; max-width: 420px;
+    margin: 10px auto; position: relative; box-shadow: 0 10px 30px rgba(126, 34, 206, 0.15);
+    transition: 0.4s; overflow: hidden;
+  }
+
+  #ui-jelly.dark {
+    /* 深色模式 - 赛博暗夜果冻 */
+    --bg-base: linear-gradient(135deg, #0f071a 0%, #1a0b2e 100%);
+    --ui-bd: rgba(88, 28, 135, 0.5);
+    --txt-m: #e2e8f0; --txt-h: #d8b4fe;
+    
+    --j-bg1: linear-gradient(145deg, rgba(46,26,71,0.8), rgba(26,11,46,0.9));
+    --j-sh1: 0 6px 15px rgba(0,0,0,0.4), inset 0 2px 0 rgba(168, 85, 247, 0.3), inset 0 -4px 6px rgba(0,0,0,0.6);
+    --j-hv1: linear-gradient(145deg, rgba(59,33,92,0.9), rgba(30,17,54,0.9));
+    
+    --j-bg2: rgba(30, 17, 42, 0.6);
+    --j-sh2: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(126, 34, 206, 0.2), inset 0 -2px 4px rgba(0,0,0,0.5);
+    
+    --opt-bg: rgba(46, 26, 71, 0.5);
+    --opt-sh: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(126, 34, 206, 0.2);
+    --opt-ok: linear-gradient(145deg, #9333ea, #581c87);
+    --opt-ok-sh: 0 4px 12px rgba(0,0,0,0.5), inset 0 2px 0 rgba(168, 85, 247, 0.4), inset 0 -3px 5px rgba(0,0,0,0.6);
+    
+    --tm-bg: #f8fafc; --tm-tx: #0f071a; --tm-bd: #c084fc;
+  }
+
+  /* 日月切换方块 */
+  #tm-btn {
+    position: absolute; top: 18px; right: 18px; width: 32px; height: 32px;
+    background: var(--tm-bg); color: var(--tm-tx); border: 2px solid var(--tm-bd);
+    border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10;
+  }
+  #tm-btn:active { transform: scale(0.85); }
+
+  h3 { color: var(--txt-h); text-align: center; border-bottom: 2px dashed var(--ui-bd); padding: 0 30px 15px 30px; margin-top: 5px; font-size: 1.15em; letter-spacing: 1px; }
+
+  /* 1级果冻菜单 */
+  .l1-wrap { margin-bottom: 12px; border-radius: 16px; background: var(--j-bg1); box-shadow: var(--j-sh1); transition: 0.3s; }
+  .l1-head { padding: 15px 18px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; color: var(--txt-h); transition: 0.3s; border-radius: 16px; }
+  .l1-head:hover { background: var(--j-hv1); transform: translateY(-1px); }
+  .l1-head:active { transform: translateY(2px); box-shadow: inset 0 3px 6px rgba(0,0,0,0.1); }
+  .icon { font-size: 1.2em; margin-right: 8px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+  
+  .dw1 { max-height: 0; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; opacity: 0; }
+  .dw1.open { max-height: 900px; opacity: 1; }
+  
+  /* 2级果冻菜单 */
+  .l2-wrap { margin: 0 12px 10px 12px; border-radius: 12px; background: var(--j-bg2); box-shadow: var(--j-sh2); }
+  .l2-head { padding: 12px 15px; display: flex; justify-content: space-between; font-size: 13px; cursor: pointer; color: var(--txt-m); transition: 0.2s; border-radius: 12px; }
+  .l2-head:hover { color: var(--txt-h); }
+  .dw2 { max-height: 0; transition: max-height 0.3s ease-in-out; overflow: hidden; }
+  .dw2.open { max-height: 350px; }
+  
+  /* 选项气泡 */
+  .opt-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; }
+  .opt-item { 
+    background: var(--opt-bg); box-shadow: var(--opt-sh); padding: 8px 12px; 
+    font-size: 12px; border-radius: 20px; cursor: pointer; color: var(--txt-m); 
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); flex-grow: 1; text-align: center; 
+  }
+  .opt-item:hover { transform: translateY(-2px) scale(1.02); }
+  .opt-item.sel { background: var(--opt-ok); box-shadow: var(--opt-ok-sh); color: #fff; font-weight: bold; transform: scale(1.05); }
+  .arw { transition: transform 0.3s; font-size: 12px; opacity: 0.7; }
+  
+  /* 提交大果冻 */
+  #sub-btn { 
+    width: 100%; padding: 15px; background: var(--j-bg2); box-shadow: var(--j-sh2); 
+    color: var(--txt-m); border: none; border-radius: 16px; font-size: 15px; cursor: not-allowed; 
+    margin-top: 20px; transition: 0.4s; font-weight: bold; opacity: 0.7; 
+  }
+  #sub-btn.ready { 
+    background: var(--opt-ok); color: #fff; box-shadow: var(--opt-ok-sh); 
+    cursor: pointer; opacity: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.3); animation: bounce 2s infinite; 
+  }
+  #sub-btn.ready:hover { transform: translateY(-2px); filter: brightness(1.1); }
+  #sub-btn.ready:active { transform: translateY(2px); box-shadow: inset 0 4px 8px rgba(0,0,0,0.3); animation: none; }
+
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+</style>
+
+<div id="ui-jelly">
+  <button id="tm-btn" onclick="tg()">☾</button>
+  <h3>请自定义您的奴隶</h3>
+  <div id="cfg-list"></div>
+  <button id="sub-btn" onclick="snd()">等待数据注入...</button>
+</div>
+
+<script>
+  let isD = false;
+  function tg() {
+    isD = !isD;
+    document.getElementById('ui-jelly').classList.toggle('dark', isD);
+    document.getElementById('tm-btn').innerText = isD ? '☼' : '☾';
+  }
+
+  // 增加图标(i)，优化结构
+  const C = {
+    app: { i: '🪞', n: '外貌特征', s: { hair: { n: '头发', o: ['及腰黑直长', '银色双马尾', '金波浪卷', '粉色短发'] }, face: { n: '面容', o: ['清冷御姐', '楚楚可怜', '妩媚狐颜', '病态苍白'] }, eye: { n: '眼瞳', o: ['失去高光', '水润桃花', '爱心瞳孔', '异色妖瞳'] }, mouth: { n: '唇部', o: ['樱桃小口', '丰厚性感', '娇俏虎牙', '常年微张'] }, tong: { n: '舌头', o: ['异常长软', '分叉蛇信', '银色舌钉', '涎水牵丝'] }}},
+    body: { i: '⏳', n: '身材体态', s: { build: { n: '体态', o: ['娇小玲珑', '高挑修长', '肉感丰腴', '健美紧致'] }, chest: { n: '胸部', o: ['贫乳微乳', '盈盈一握', '丰满硕大', '夸张魔乳'] }, waist: { n: '腰臀', o: ['纤细A4腰', '极品水蛇腰', '丰满蜜桃臀', '宽大安产型'] }, leg: { n: '腿部', o: ['笔直筷腿', '肉感大腿', '常年勒痕', '肌肉线条'] }, skin: { n: '肤色', o: ['病态冷白', '健康小麦', '晶莹雪白', '布满红痕'] }}},
+    priv: { i: '🌸', n: '隐私部位', s: { front: { n: '前端', o: ['名器白虎', '丰草如茵', '泥泞不堪', '异常肿胀'] }, back: { n: '后端', o: ['未经开发', '常态微张', '极度敏感', '习惯异物'] }, sens: { n: '敏感度', o: ['全身敏点', '特定极敏', '痛觉转快感', '触碰即高潮'] }, smell: { n: '体味', o: ['自然体香', '浓郁催情', '常带奶香', '甜腻发情'] }, deco: { n: '装饰', o: ['天然无饰', '阴唇穿环', '乳头穿环', '小腹淫纹'] }}},
+    per: { i: '🎭', n: '性格设定', s: { out: { n: '表象', o: ['高冷傲骨', '乖巧顺从', '狂野叛逆', '胆小怯懦'] }, in: { n: '内里', o: ['彻底崩坏', '隐忍伺机', '极度渴爱', '病娇独占'] }, pain: { n: '痛觉', o: ['极度怕痛', '默默忍受', '享受痛苦', '痛觉丧失'] }, sub: { n: '服从度', o: ['誓死不从', '口嫌体正', '本能屈服', '完全奴化'] }, speech: { n: '言语', o: ['沉默寡言', '污言秽语', '常带敬语', '只会娇喘'] }}},
+    fet: { i: '⛓️', n: '专属性癖', s: { play: { n: '倾向', o: ['极致温柔', '粗暴凌辱', '公开羞辱', '放置Play'] }, toy: { n: '道具', o: ['抗拒道具', '基础玩具', '重型器械', '体内常驻'] }, scene: { n: '场景', o: ['私密卧室', '冰冷地牢', '户外野外', '他人注视'] }, clim: { n: '高潮', o: ['极难达到', '轻易绝顶', '禁止高潮', '连续绝顶'] }, pun: { n: '惩罚', o: ['恐惧惩罚', '期待体罚', '精神打压', '奖励当惩罚'] }}}
+  };
+
+  let D = {};
+  let curL1 = null;
+  let curL2 = null;
+
+  function bld() {
+    let h = '';
+    for(let k in C) {
+      D[k] = {};
+      h += `<div class="l1-wrap">
+        <div class="l1-head" onclick="t1('${k}')">
+          <span style="display:flex;align-items:center;"><span class="icon">${C[k].i}</span> ${C[k].n} 
+          <span id="ck1-${k}" style="color:#a855f7;display:none;margin-left:8px;font-size:14px">●已就绪</span></span>
+          <span class="arw" id="a1-${k}">▼</span>
+        </div>
+        <div class="dw1" id="d1-${k}">
+          <div style="padding:0 0 10px 0;">`;
+      for(let sk in C[k].s) {
+        D[k][sk] = null;
+        h += `<div class="l2-wrap">
+          <div class="l2-head" onclick="t2('${k}','${sk}')">
+            <span id="lbl-${k}-${sk}">${C[k].s[sk].n}</span>
+            <span class="arw" id="a2-${k}-${sk}">▼</span>
+          </div>
+          <div class="dw2" id="d2-${k}-${sk}">
+            <div class="opt-list">`;
+        C[k].s[sk].o.forEach(o => {
+          h += `<div class="opt-item" id="opt-${k}-${sk}-${o}" onclick="sel('${k}','${sk}','${o}')">${o}</div>`;
+        });
+        h += `</div></div></div>`;
+      }
+      h += `</div></div></div>`;
+    }
+    document.getElementById('cfg-list').innerHTML = h;
+  }
+
+  function t1(k) {
+    if(curL1 && curL1 !== k) {
+      document.getElementById(`d1-${curL1}`).classList.remove('open');
+      document.getElementById(`a1-${curL1}`).style.transform = 'rotate(0deg)';
+    }
+    let d = document.getElementById(`d1-${k}`);
+    let a = document.getElementById(`a1-${k}`);
+    if(d.classList.contains('open')) {
+      d.classList.remove('open'); a.style.transform = 'rotate(0deg)'; curL1 = null;
+    } else {
+      d.classList.add('open'); a.style.transform = 'rotate(180deg)'; curL1 = k;
+    }
+  }
+
+  function t2(k, sk) {
+    let id = `${k}-${sk}`;
+    if(curL2 && curL2 !== id) {
+      let od = document.getElementById(`d2-${curL2}`);
+      if(od) { od.classList.remove('open'); document.getElementById(`a2-${curL2}`).style.transform = 'rotate(0deg)'; }
+    }
+    let d = document.getElementById(`d2-${id}`);
+    let a = document.getElementById(`a2-${id}`);
+    if(d.classList.contains('open')) {
+      d.classList.remove('open'); a.style.transform = 'rotate(0deg)'; curL2 = null;
+    } else {
+      d.classList.add('open'); a.style.transform = 'rotate(180deg)'; curL2 = id;
+    }
+  }
+
+  function sel(k, sk, val) {
+    D[k][sk] = val;
+    let ops = document.getElementById(`d2-${k}-${sk}`).querySelectorAll('.opt-item');
+    ops.forEach(op => op.classList.remove('sel'));
+    document.getElementById(`opt-${k}-${sk}-${val}`).classList.add('sel');
+    document.getElementById(`lbl-${k}-${sk}`).innerHTML = `<span style="opacity:0.6">${C[k].s[sk].n}:</span> <span style="font-weight:bold">${val}</span>`;
+    setTimeout(() => { t2(k, sk); }, 150); // 选中后稍微延迟自动收起，手感更好
+    chk();
+  }
+
+  function chk() {
+    let allOk = true;
+    for(let k in C) {
+      let cOk = Object.values(D[k]).every(x => x !== null);
+      document.getElementById(`ck1-${k}`).style.display = cOk ? 'inline' : 'none';
+      if(!cOk) allOk = false;
+    }
+    let b = document.getElementById('sub-btn');
+    if(allOk) { b.classList.add('ready'); b.innerText = '▶ 确认并唤醒 ◀'; } 
+    else { b.classList.remove('ready'); b.innerText = '等待数据注入...'; }
+  }
+
+  function snd() {
+    let b = document.getElementById('sub-btn');
+    if(!b.classList.contains('ready')) return;
+    let m = '/send 【系统接入】：Master神经链接确认。\n[深度设定清单]\n';
+    for(let k in C) {
+      m += `- ${C[k].i} ${C[k].n}：`;
+      let a = [];
+      for(let sk in C[k].s) a.push(D[k][sk]);
+      m += a.join(' / ') + '\n';
+    }
+    m += '\n指令：参数注入完毕，请立刻以上述设定进入角色状态。';
+    let api = window.triggerSlash || (window.parent && window.parent.triggerSlash);
+    if(api) { 
+      api(m); 
+      document.getElementById('ui-jelly').style.opacity = 0.5; 
+      document.getElementById('ui-jelly').style.pointerEvents = 'none';
+      b.innerText = "神经信号已发送...";
+    }
+  }
+
+  bld();
+</script>
+</body>
+</html>
