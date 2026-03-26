@@ -72,15 +72,16 @@
   .l1-head:active { transform: translateY(2px); box-shadow: inset 0 3px 6px rgba(0,0,0,0.1); }
   .icon { font-size: 1.2em; margin-right: 8px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
   
-  .dw1 { max-height: 0; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; opacity: 0; }
-  .dw1.open { max-height: 900px; opacity: 1; }
+  .dw1{max-height:0;transition:all .25s ease-out;overflow:hidden;opacity:0;will-change:max-height,opacity;transform:translateZ(0)}
+  .dw1.o{max-height:400px;opacity:1}
+
   
   /* 2级果冻菜单 */
   .l2-wrap { margin: 0 12px 10px 12px; border-radius: 12px; background: var(--j-bg2); box-shadow: var(--j-sh2); }
   .l2-head { padding: 12px 15px; display: flex; justify-content: space-between; font-size: 13px; cursor: pointer; color: var(--txt-m); transition: 0.2s; border-radius: 12px; }
   .l2-head:hover { color: var(--txt-h); }
-  .dw2 { max-height: 0; transition: max-height 0.3s ease-in-out; overflow: hidden; }
-  .dw2.open { max-height: 350px; }
+  .dw2{max-height:0;transition:all .2s ease-out;overflow:hidden;will-change:max-height;transform:translateZ(0)}
+  .dw2.o{max-height:200px}
   
   /* 选项气泡 */
   .opt-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; }
