@@ -1,0 +1,85 @@
+(function() {
+    // 防止重复生成
+    if(document.getElementById('slave-ui-modal')) return;
+
+    // 1. 注入 CSS 样式
+    const style = document.createElement('style');
+    style.innerHTML = `
+      #slave-ui-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9998; display: flex; justify-content: center; align-items: center; }
+      #slave-ui-modal { background: rgba(30, 17, 42, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 16px; width: 90%; max-width: 400px; padding: 20px; color: #e2e8f0; font-family: sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 9999; max-height: 85vh; overflow-y: auto; }
+      #slave-ui-modal::-webkit-scrollbar { width: 6px; }
+      #slave-ui-modal::-webkit-scrollbar-thumb { background: #7e22ce; border-radius: 3px; }
+      .ui-title { color: #d8b4fe; text-align: center; border-bottom: 2px dashed #581c87; padding-bottom: 12px; margin-top: 0; font-size: 1.2em; letter-spacing: 1px; }
+      .ui-group { background: rgba(46, 26, 71, 0.6); border: 1px solid #4c1d95; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+      .ui-group-head { padding: 12px 15px; font-weight: bold; color: #c084fc; border-bottom: 1px solid rgba(76, 29, 149, 0.5); font-size: 14px; }
+      .ui-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      .ui-row:last-child { border-bottom: none; }
+      .ui-label { font-size: 13px; color: #cbd5e1; }
+      .ui-select { background: rgba(15, 7, 26, 0.8); color: #fff; border: 1px solid #7e22ce; padding: 6px 10px; border-radius: 6px; width: 60%; font-size: 12px; outline: none; appearance: none; text-align: center; }
+      .ui-btn { width: 100%; padding: 14px; background: rgba(76, 29, 149, 0.5); color: #94a3b8; border: 1px solid #581c87; border-radius: 10px; font-size: 15px; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+      .ui-btn.ready { background: linear-gradient(135deg, #9333ea, #581c87); color: #fff; border: none; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4); cursor: pointer; }
+    `;
+    document.head.appendChild(style);
+
+    // 2. 注入 HTML 结构
+    const overlay = document.createElement('div');
+    overlay.id = 'slave-ui-overlay';
+    
+    // 配置数据字典
+    const C = {
+      app: { n: '🪞 外貌特征', s: { hair: { n: '头发', o: ['及腰黑直长', '银色双马尾', '金波浪卷', '粉色短发'] }, face: { n: '面容', o: ['清冷御姐颜', '楚楚可怜脸', '妩媚狐媚颜', '病态苍白脸'] }, eye: { n: '眼睛', o: ['空洞失去高光', '水润桃花眼', '常带爱心瞳', '异色妖异瞳'] }}},
+      body: { n: '⏳ 身材体态', s: { build: { n: '体态', o: ['娇小玲珑', '高挑修长', '肉感丰腴', '健美紧致'] }, chest: { n: '胸部', o: ['贫乳微乳', '盈盈一握', '丰满硕大', '夸张魔乳'] }, waist: { n: '腰臀', o: ['纤细A4腰', '极品水蛇腰', '丰满蜜桃臀', '宽大安产型'] }}},
+      priv: { n: '🌸 隐私部位', s: { front: { n: '前端', o: ['名器白虎', '丰草如茵', '泥泞不堪', '异常肿胀'] }, back: { n: '后端', o: ['未经开发', '常态微张', '极度敏感', '习惯异物'] }, sens: { n: '敏感度', o: ['全身皆敏', '特定极敏', '痛转快感', '碰即高潮'] }}},
+      per: { n: '🎭 性格设定', s: { out: { n: '表象', o: ['高冷傲骨', '乖巧顺从', '狂野叛逆', '胆小怯懦'] }, in: { n: '内里', o: ['彻底崩坏', '隐忍伺机', '极度渴爱', '病娇独占'] }, sub: { n: '服从度', o: ['誓死不从', '口嫌体正', '本能屈服', '完全奴化'] }}},
+      fet: { n: '⛓️ 专属性癖', s: { play: { n: '倾向', o: ['极致温柔', '粗暴凌辱', '公开羞辱', '放置Play'] }, toy: { n: '道具', o: ['抗拒道具', '基础玩具', '重型器械', '体内常驻'] }, clim: { n: '高潮', o: ['极难达到', '轻易绝顶', '禁止高潮', '连续绝顶'] }}}
+    };
+
+    let html = `<div id="slave-ui-modal"><div class="ui-title">请自定义您的奴隶</div>`;
+    for(let k in C) {
+      html += `<div class="ui-group"><div class="ui-group-head">${C[k].n}</div>`;
+      for(let sk in C[k].s) {
+        html += `<div class="ui-row"><span class="ui-label">${C[k].s[sk].n}</span><select class="ui-select cfg-sel" data-cat="${C[k].n}" data-sub="${C[k].s[sk].n}"><option value="" disabled selected>选择...</option>`;
+        C[k].s[sk].o.forEach(o => html += `<option value="${o}">${o}</option>`);
+        html += `</select></div>`;
+      }
+      html += `</div>`;
+    }
+    html += `<button id="slave-ui-btn" class="ui-btn">等待配置完成...</button></div>`;
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+
+    // 3. 逻辑与交互
+    const selects = document.querySelectorAll('.cfg-sel');
+    const btn = document.getElementById('slave-ui-btn');
+
+    selects.forEach(sel => {
+      sel.addEventListener('change', () => {
+        let allOk = Array.from(selects).every(s => s.value !== "");
+        if(allOk) {
+          btn.classList.add('ready');
+          btn.innerText = "▶ 确认注入设定 ◀";
+        }
+      });
+    });
+
+    btn.addEventListener('click', () => {
+      if(!btn.classList.contains('ready')) return;
+      
+      let msg = '/send 【系统接入】：Master神经链接确认。\n[深度设定清单]\n';
+      let currentCat = '';
+      selects.forEach(sel => {
+        if(sel.dataset.cat !== currentCat) {
+          currentCat = sel.dataset.cat;
+          msg += `\n- ${currentCat}:\n`;
+        }
+        msg += `  ${sel.dataset.sub}: ${sel.value}\n`;
+      });
+      msg += '\n[指令]：参数注入完毕，请立刻以上述设定进入角色状态。';
+
+      let api = window.triggerSlash || (window.parent && window.parent.triggerSlash);
+      if(api) {
+        api(msg);
+        document.body.removeChild(overlay); // 发送完毕后直接关闭这个悬浮窗！
+      }
+    });
+})();
